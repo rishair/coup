@@ -1,0 +1,52 @@
+package coup;
+
+service CoupPlayer {
+  rpc InitializePlayer (Empty) returns (PlayerInit);
+  rpc GameBegin (CoupGame) returns (Empty);
+  rpc RespondToAction (Action) returns (CounterAction);
+  rpc TakeTurn (CoupGame) returns (Action);
+}
+
+message Empty {}
+
+message PlayerInit {
+  required string name      = 1;
+}
+
+message Player {
+  required string name      = 1;
+  required int32 coins      = 2;
+  required int32 influences = 3;
+}
+
+message CoupGame {
+  repeated Player players   = 1;
+}
+
+message Action {
+  required ActionType action  = 1;
+  required string performer   = 2;
+  optional string recipient   = 3;
+}
+
+message CounterAction {
+  required CounterActionType counter_action = 1;
+}
+
+enum ActionType {
+  INCOME        = 1;
+  FOREIGN_AID   = 2;
+  COUP          = 3;
+  TAX           = 4;
+  ASSASSINATE   = 5;
+  STEAL         = 6;
+  EXCHANGE      = 7;
+}
+
+enum CounterActionType {
+  NOTHING             = 0;
+  CALL_BLUFF          = 1;
+  BLOCK_FOREIGN_AID   = 2;
+  BLOCK_ASSASINATION  = 3;
+  BLOCK_STEAL         = 4;
+}
