@@ -9,7 +9,7 @@ pip install -r requirements.txt
 ```
 ### Generating Thrift Bindings
 ```bash
-thrift -r --gen py coup.thrift
+thrift -recurse -o . --gen py coup.thrift
 ```
 
 ### Start Player
