@@ -30,15 +30,15 @@ class CoupDeck(Deck):
   def __init__(self):
     Deck.__init__(self)
     influences = [
-      Influence.DUKE,
-      Influence.ASSASSIN,
-      Influence.CONTESSA,
-      Influence.CAPTAIN,
-      Influence.AMBASSADOR
+      InfluenceType.DUKE,
+      InfluenceType.ASSASSIN,
+      InfluenceType.CONTESSA,
+      InfluenceType.CAPTAIN,
+      InfluenceType.AMBASSADOR
     ]
 
     for influence in influences:
-      self.add([influence] * 3)
+      self.add([PlayerInfluence(influence)] * 3)
     self.shuffle()
 
 

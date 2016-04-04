@@ -14,7 +14,7 @@ except:
   fastbinary = None
 
 
-class Influence:
+class InfluenceType:
   UNKNOWN = 1
   DUKE = 2
   ASSASSIN = 3
@@ -154,6 +154,81 @@ class PlayerInit:
   def __ne__(self, other):
     return not (self == other)
 
+class PlayerInfluence:
+  """
+  Attributes:
+   - influence
+   - revealed
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.I32, 'influence', None, None, ), # 1
+    (2, TType.BOOL, 'revealed', None, False, ), # 2
+  )
+
+  def __init__(self, influence=None, revealed=thrift_spec[2][4],):
+    self.influence = influence
+    self.revealed = revealed
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.I32:
+          self.influence = iprot.readI32();
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.BOOL:
+          self.revealed = iprot.readBool();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('PlayerInfluence')
+    if self.influence != None:
+      oprot.writeFieldBegin('influence', TType.I32, 1)
+      oprot.writeI32(self.influence)
+      oprot.writeFieldEnd()
+    if self.revealed != None:
+      oprot.writeFieldBegin('revealed', TType.BOOL, 2)
+      oprot.writeBool(self.revealed)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+    def validate(self):
+      if self.influence is None:
+        raise TProtocol.TProtocolException(message='Required field influence is unset!')
+      if self.revealed is None:
+        raise TProtocol.TProtocolException(message='Required field revealed is unset!')
+      return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
 class Player:
   """
   Attributes:
@@ -166,8 +241,7 @@ class Player:
     None, # 0
     (1, TType.STRING, 'id', None, None, ), # 1
     (2, TType.I32, 'coins', None, None, ), # 2
-    None, # 3
-    (4, TType.LIST, 'influences', (TType.I32,None), None, ), # 4
+    (3, TType.LIST, 'influences', (TType.STRUCT,(PlayerInfluence, PlayerInfluence.thrift_spec)), None, ), # 3
   )
 
   def __init__(self, id=None, coins=None, influences=None,):
@@ -194,12 +268,13 @@ class Player:
           self.coins = iprot.readI32();
         else:
           iprot.skip(ftype)
-      elif fid == 4:
+      elif fid == 3:
         if ftype == TType.LIST:
           self.influences = []
           (_etype3, _size0) = iprot.readListBegin()
           for _i4 in xrange(_size0):
-            _elem5 = iprot.readI32();
+            _elem5 = PlayerInfluence()
+            _elem5.read(iprot)
             self.influences.append(_elem5)
           iprot.readListEnd()
         else:
@@ -223,10 +298,10 @@ class Player:
       oprot.writeI32(self.coins)
       oprot.writeFieldEnd()
     if self.influences != None:
-      oprot.writeFieldBegin('influences', TType.LIST, 4)
-      oprot.writeListBegin(TType.I32, len(self.influences))
+      oprot.writeFieldBegin('influences', TType.LIST, 3)
+      oprot.writeListBegin(TType.STRUCT, len(self.influences))
       for iter6 in self.influences:
-        oprot.writeI32(iter6)
+        iter6.write(oprot)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()

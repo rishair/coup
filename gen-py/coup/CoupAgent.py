@@ -27,6 +27,14 @@ class Iface:
     """
     pass
 
+  def game_end(self, game, winner):
+    """
+    Parameters:
+     - game
+     - winner
+    """
+    pass
+
   def respond_to_action(self, game, action):
     """
     Parameters:
@@ -110,6 +118,36 @@ class Client(Iface):
       self._iprot.readMessageEnd()
       raise x
     result = game_begin_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    return
+
+  def game_end(self, game, winner):
+    """
+    Parameters:
+     - game
+     - winner
+    """
+    self.send_game_end(game, winner)
+    self.recv_game_end()
+
+  def send_game_end(self, game, winner):
+    self._oprot.writeMessageBegin('game_end', TMessageType.CALL, self._seqid)
+    args = game_end_args()
+    args.game = game
+    args.winner = winner
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_game_end(self, ):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = game_end_result()
     result.read(self._iprot)
     self._iprot.readMessageEnd()
     return
@@ -217,6 +255,7 @@ class Processor(Iface, TProcessor):
     self._processMap = {}
     self._processMap["initialize_player"] = Processor.process_initialize_player
     self._processMap["game_begin"] = Processor.process_game_begin
+    self._processMap["game_end"] = Processor.process_game_end
     self._processMap["respond_to_action"] = Processor.process_respond_to_action
     self._processMap["take_turn"] = Processor.process_take_turn
     self._processMap["select_influences"] = Processor.process_select_influences
@@ -254,6 +293,17 @@ class Processor(Iface, TProcessor):
     result = game_begin_result()
     self._handler.game_begin(args.game, args.player)
     oprot.writeMessageBegin("game_begin", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
+  def process_game_end(self, seqid, iprot, oprot):
+    args = game_end_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = game_end_result()
+    self._handler.game_end(args.game, args.winner)
+    oprot.writeMessageBegin("game_end", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -491,6 +541,120 @@ class game_begin_result:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
     oprot.writeStructBegin('game_begin_result')
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+    def validate(self):
+      return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class game_end_args:
+  """
+  Attributes:
+   - game
+   - winner
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRUCT, 'game', (CoupGame, CoupGame.thrift_spec), None, ), # 1
+    (2, TType.STRUCT, 'winner', (Player, Player.thrift_spec), None, ), # 2
+  )
+
+  def __init__(self, game=None, winner=None,):
+    self.game = game
+    self.winner = winner
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRUCT:
+          self.game = CoupGame()
+          self.game.read(iprot)
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRUCT:
+          self.winner = Player()
+          self.winner.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('game_end_args')
+    if self.game != None:
+      oprot.writeFieldBegin('game', TType.STRUCT, 1)
+      self.game.write(oprot)
+      oprot.writeFieldEnd()
+    if self.winner != None:
+      oprot.writeFieldBegin('winner', TType.STRUCT, 2)
+      self.winner.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+    def validate(self):
+      return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class game_end_result:
+
+  thrift_spec = (
+  )
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('game_end_result')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
     def validate(self):

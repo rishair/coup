@@ -13,3 +13,6 @@ if __name__ == "__main__":
   game = Game()
   game.add_player(PlayerClient("localhost", 3000))
   game.begin()
+  while not game.winner() == None:
+    game.take_turn()
+  game.end()

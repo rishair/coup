@@ -7,7 +7,7 @@ struct PlayerInit {
   1: required PlayerId id
 }
 
-enum Influence {
+enum InfluenceType {
   UNKNOWN       = 1
   DUKE          = 2
   ASSASSIN      = 3
@@ -16,10 +16,15 @@ enum Influence {
   AMBASSADOR    = 6
 }
 
+struct PlayerInfluence {
+  1: required InfluenceType influence
+  2: required bool revealed = 0
+}
+
 struct Player {
   1: required PlayerId id
   2: required i32 coins
-  4: required list<Influence> influences
+  3: required list<PlayerInfluence> influences
 }
 
 enum ActionType {
@@ -66,6 +71,11 @@ service CoupAgent {
     2: Player player
   )
 
+  void game_end(
+    1: CoupGame game,
+    2: Player winner
+  )
+
   CounterAction respond_to_action(
     1: CoupGame game,
     2: Action action
@@ -75,9 +85,9 @@ service CoupAgent {
     1: CoupGame game
   )
 
-  list<Influence> select_influences(
+  list<InfluenceType> select_influences(
     1: CoupGame game,
-    2: list<Influence> influences,
+    2: list<InfluenceType> influences,
     3: i32 count
   )
 }

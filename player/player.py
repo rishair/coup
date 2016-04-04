@@ -17,6 +17,10 @@ class RandomizedAgentHandler:
     print "GameBegin(%s, %s)" % (game, player)
     pass
 
+  def game_end(self, game, winner):
+    print "Gameend(%s, %s)" % (game, winner)
+    pass
+
   def respond_to_action(self, action):
     print "RespondToAction(%s)" % action
     return CounterAction(CounterActionType.NOTHING)

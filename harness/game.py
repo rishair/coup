@@ -53,10 +53,32 @@ class Game:
     if not self.game_in_progress:
       self.game_in_progress = True
       for player in self.players.values():
+        player.set_coins(2)
         player.add_influences(self.deck.draw(2))
+
+      for player in self.players.values():
         player.client.game_begin(self.__gen_game(player), player.serialize())
     else:
       raise Exception("Game already in progress")
+
+  def winner(self):
+    winner = None
+    for player in self.players.values():
+      if len(player.influences) > 0:
+        if winner == None:
+          winner = player
+        else:
+          return None
+    return winner
+
+  def take_turn(self):
+    pass
+
+  def end(self):
+    winner = self.winner()
+    if winner == None:
+      for player in self.players.values():
+        player.client.game_end(self.__gen_game(player), player.serialize())
 
 
 
